@@ -27,9 +27,7 @@ def add_comment_to_packet(input_pcapng_file, output_pcapng_file, comment, packet
     o_open_file = PcapWriter(output_pcapng_file) 
     
     if 0 <= packet_index < len(packets):
-
-        print(color.BLUE + '\n[+]' + color.END + f' Generating {output_pcapng_file}...')
-        
+ 
         for p in packets:
             if p == packets[packet_index]:
                 print(color.BLUE + '\n[+]' + color.END + ' Adding comment...\n')
@@ -37,12 +35,13 @@ def add_comment_to_packet(input_pcapng_file, output_pcapng_file, comment, packet
                 p.show()
                 o_open_file.write(p)  # Write packet in new file
                 o_open_file.flush()
+                print(color.BLUE + '\n[+]' + color.END + f' Generating {output_pcapng_file}...')
 
             else:
                 o_open_file.write(p) # Write packet in new file
                 o_open_file.flush()
 
-        print(color.GREEN + '\n[+]' + color.END + 'Comment added succesfully\n')
+        print(color.GREEN + '\n[+]' + color.END + ' Comment added succesfully\n')
     
     else:
         print("Packet number out of range")
@@ -58,8 +57,11 @@ def read_comment_from_packet(input_pcapng_file, packet_number):
         packet = packets[packet_index]
         layer = packet.lastlayer()
         if str(layer)=="Padding":
-            comment = packet.getfieldval("load").decode('utf-8')
-            print(color.GREEN + f"Comment found in packet {packet_number}: " + color.END + f"{comment}\n")
+            comment = packet.getfieldval("load")
+            comment_json = {
+                "comment": comment.decode('utf-8')  # Decoding if the comment is encoded
+            }
+            print(color.GREEN + f"Comment found in packet {packet_number}:\n" + color.END + f"{comment_json}\n")
         else:
             print(color.RED + f"No comment found in packet {packet_number}\n" + color.END)
     else:
